@@ -1,0 +1,26 @@
+
+================ FP 3 ==============
+
+(Core Problem)
+No UI.
+Use Python command line prompt
+Keep all the source images in one directory (input_images)
+Give a request to generate an image.
+Save the generated image in the new output directory (output_images)
+
+
+================ FP4 ==============
+
+ 
+No UI.
+Use Python command line prompt
+Keep all the source images in one directory (input_images_1)
+Keep all the source images of different style in a separate directory (input_images_2)
+Give a request to generate an image in a specific style.
+Save the generated image in the new output directory (output_images)
+
+
+=============== FP 5 ==================
+Converting the python script into Web UI / using Flask
+
+
