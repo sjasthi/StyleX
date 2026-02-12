@@ -26,8 +26,8 @@ output_dir.mkdir(exist_ok=True)
 
 timestamp = time.strftime("%Y%m%d_%H%M%S")
 
-# Save or display the images
+# Save the images to the output_images directory with a timestamp in the filename to avoid overwriting previous images. 
 for i, img in enumerate(images):
-    img.save(output_dir / f"{timestamp}_image_{i}.png")  # Save each image
+    img.save(output_dir / f"{timestamp}_image_{i}.png")  
 
 print("Image/s saved to output_images")
