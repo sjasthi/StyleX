@@ -1,0 +1,29 @@
+Ensure Python is installed on your machine
+    python --version (inside of the terminal)
+
+Intsall CUDA (if you have an NVIDIA GPU)
+    https://developer.nvidia.com/cuda-downloads
+
+In a terminal (powershell) create and activate a virtual environment
+    python -m venv env
+    .\env\Scripts\activate
+
+Install the required packages
+    pip install -r requirements.txt
+
+Install PyTorch
+    https://pytorch.org/get-started/locally/
+    Follow Website instructions
+
+Create Hugging Face Account
+    After logging in, go to account settings and generate an access token
+    Then run 'hf auth login' (remove the ' surrounding hf auth login) and paste your access token when prompted
+
+Optional (You may have to or may not) Request Access to High End Models
+    Follow the instructions on the link: https://huggingface.co/stabilityai/stable-diffusion-3.5-large
+
+Run 3-5.py
+    python src\3-5.py  
+
+Changing the prompt
+    Inside the 3-5.py prompt = "" (Change prompt to what you would like)
