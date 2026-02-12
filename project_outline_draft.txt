@@ -19,6 +19,7 @@ Keep all the source images of different style in a separate directory (input_ima
 Give a request to generate an image in a specific style.
 Save the generated image in the new output directory (output_images)
 
+Saaid and Anas to give demo during FP4
 
 =============== FP 5 ==================
 Converting the python script into Web UI / using Flask
