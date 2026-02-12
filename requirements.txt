@@ -1,0 +1,6 @@
+diffusers[torch]
+huggingface_hub
+transformers
+accelerate
+sentencepiece
+protobuf
