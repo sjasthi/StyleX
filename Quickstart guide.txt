@@ -26,4 +26,4 @@ Run 3-5.py
     python src\3-5.py  
 
 Changing the prompt
-    Inside the 3-5.py prompt = "" (Change prompt to what you would like)
+    Inside the 3-5.py prompt = "" (Change prompt to what you would like) 

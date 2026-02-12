@@ -9,7 +9,7 @@ pipe = StableDiffusion3Pipeline.from_pretrained(medium_model, torch_dtype=torch.
 pipe.enable_attention_slicing()
 pipe = pipe.to("cuda") # Leave as cuda if you have a NVIDIA GPU. # If you don't have a NVIDIA GPU, change "cuda" to "cpu" to run the model on your CPU, but it will be much slower and may not work if you don't have enough RAM.
 
-prompt = "a cyperpunk landscape"
+prompt = "a dog sitting in a park, sunny day, photorealistic"
 
 results = pipe(
     prompt,
