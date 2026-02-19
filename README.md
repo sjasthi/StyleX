@@ -16,6 +16,12 @@ Install the required packages
 Install PyTorch
     https://pytorch.org/get-started/locally/
     Follow Website instructions
+       Make sure to have these version:
+            torch: 2.10.0+cu130
+            cuda available: True
+            cuda version: 13.0
+        Verify version with this command:
+            python -c "import torch; print('torch:', torch.__version__); print('cuda available:', torch.cuda.is_available()); print('cuda version:', torch.version.cuda)"
 
 Create Hugging Face Account
     After logging in, go to account settings and generate an access token
