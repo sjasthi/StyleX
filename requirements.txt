@@ -1,5 +1,4 @@
 diffusers[torch]
-huggingface_hub
 transformers
 accelerate
 sentencepiece
@@ -7,5 +6,4 @@ protobuf
 pillow
 numpy
 safetensors
-sentencepiece
-protobuf<5.0.0
+
