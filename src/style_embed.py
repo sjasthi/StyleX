@@ -1,5 +1,5 @@
 from __future__ import annotations
-# Embedding-based "style extraction" from reference images (NO IP-Adapter).
+# Embedding-based "style extraction" from reference images (No IP-Adapter).
 
 # Idea:
 # - Compute an image embedding for each reference image in input_images/<style>/
