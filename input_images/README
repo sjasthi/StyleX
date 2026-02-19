@@ -1,1 +1,17 @@
 Place reference images in this folder. 
+
+1.) Create a new folder and name it the style of images you plan to place in the folder
+2.) Add images to that folder to the structure of the project, which is something like this:
+  StyleX/
+  src/
+    main.py
+    generate.py
+    style_embed.py
+    styles.py
+    utils.py
+  input_images/
+    anime/
+      (put reference images here)
+    cyberpunk/
+      (put reference images here)
+  
