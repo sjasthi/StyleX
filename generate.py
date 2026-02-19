@@ -6,8 +6,6 @@ Windows + VS Code + PowerShell friendly SDXL image generator.
 
 Supports:
 - Text-to-image
-- Optional img2img
-- Style sets via subfolders (Option A)
 - Multiple style images blended into ONE style reference
 - No UI
 
