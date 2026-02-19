@@ -22,6 +22,22 @@ Save the generated image in the new output directory (output_images)
 Saaid and Anas to give demo during FP4
 
 =============== FP 5 ==================
+externlize the prompt  (prompt.txt)
+
+[1] prompt 1 that spans across mutiple lines
+
+[2] Can you generate an image of Neil Armstrong based on Picasso Style?
+ENsure that Armstrong is drinking coffee in space
+
+[3] Prompt 3 : is a paragraph of text
+
+
+
+Your python code relies on "style" directory and this prompt.txt to generate multiple images in one go.
+
+Make sure that all  of you are in sync and the code is prompted to github main branch.
+
+============ FP 6, FP 7, FP 8 and FP 9 ============
 Converting the python script into Web UI / using Flask
 
 
