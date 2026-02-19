@@ -1,0 +1,19 @@
+1. Activate venv: .\.venv\Scripts\Activate.ps1
+2. Install PyTorch: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
+3. Install stack: pip install diffusers transformers accelerate safetensors pillow numpy huggingface_hub
+4. huggingface login: hf auth login, hf auth whoami
+5. generate.py file
+
+Prompt example: python generate.py `
+>>   --prompt "Brutalist architecture scene, massive raw concrete structures, monolithic geometric forms, exposed бетон concrete surfaces, sharp angles and heavy symmetry, towering scale, minimal color palette, overcast sky, dramatic shadows, cinematic lighting, ultra-detailed textures, high contrast, architectural photography style" `
+>>   --negative-prompt "blurry, low resolution, cartoon, oversaturated, watermark, text, logo" `
+>>   --style-set brutalist `      
+>>   --steps 35 `
+>>   --guidance 7 `
+>>   --style-scale 0.6 `
+>>   --dtype fp16 `
+>>   --num-images 1
+
+--steps = Number of denoising steps the diffusion model runs more. More steps = more refinement.
+--guidance = How strongly the model obeys your text prompt. Low guidance → model gets creative. High guidance → model sticks tightly to your words
+--dtype = Numerical precision used for model weights and math. fp16 (best default)
