@@ -2,20 +2,17 @@
 """
 generate.py
 
-Windows + PowerShell friendly CLI diffusion image generator.
+Windows + VS Code + PowerShell friendly SDXL image generator.
 
-Features:
-- Text-to-image (SDXL)
-- Optional img2img (content image)
-- Style conditioning via IP-Adapter
-- Multiple style images blended into ONE coherent style
+Supports:
+- Text-to-image
+- Optional img2img
+- Style sets via subfolders (Option A)
+- Multiple style images blended into ONE style reference
 - No UI
-- input_images/  -> source images
-- output_images/ -> generated results
 
-IMPORTANT:
-Uses SDXL-compatible IP-Adapter weight:
-  ip-adapter_sdxl.safetensors
+Style folders live in:
+  input_images/styles/<style-set>/
 """
 
 import argparse
@@ -26,30 +23,28 @@ from typing import List, Optional
 import numpy as np
 import torch
 from PIL import Image
-from diffusers import (
-    StableDiffusionXLPipeline,
-    StableDiffusionXLImg2ImgPipeline,
-)
+from diffusers import StableDiffusionXLPipeline, StableDiffusionXLImg2ImgPipeline
 
 # ---------------- CONFIG ----------------
 
 DEFAULT_MODEL = "stabilityai/stable-diffusion-xl-base-1.0"
 
+DEFAULT_INPUT_DIR = "input_images"
+DEFAULT_OUTPUT_DIR = "output_images"
+
+STYLES_ROOT = "styles"  # subfolder under input_images/
+
 IPADAPTER_REPO = "h94/IP-Adapter"
 IPADAPTER_SUBFOLDER = "sdxl_models"
 IPADAPTER_WEIGHT = "ip-adapter_sdxl.safetensors"
 
-# ----------------------------------------
+SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tif", ".tiff"}
+
+# ---------------------------------------
 
 
 def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
-
-
-def csv_list(value: str) -> List[str]:
-    if not value:
-        return []
-    return [v.strip() for v in value.split(",") if v.strip()]
 
 
 def timestamp_name(prefix: str, ext: str = "png") -> str:
@@ -70,9 +65,11 @@ def load_rgb(path: Path) -> Image.Image:
 
 def blend_style_images(images: List[Image.Image], size: int = 512) -> Image.Image:
     """
-    Blend multiple style images into ONE image.
-    Prevents grid/panel artifacts and satisfies IP-Adapter's single-image rule.
+    Blend multiple style images into ONE image to avoid panel artifacts.
     """
+    if not images:
+        raise ValueError("No style images provided.")
+
     if len(images) == 1:
         return images[0]
 
@@ -83,18 +80,23 @@ def blend_style_images(images: List[Image.Image], size: int = 512) -> Image.Imag
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SDXL + IP-Adapter image generator (CLI)")
+    parser = argparse.ArgumentParser(description="SDXL + IP-Adapter image generator (style folders)")
 
     parser.add_argument("--prompt", required=True, help="Text prompt")
     parser.add_argument("--negative-prompt", default="", help="Negative prompt")
 
-    parser.add_argument("--input-dir", default="input_images", help="Input image directory")
-    parser.add_argument("--output-dir", default="output_images", help="Output directory")
+    parser.add_argument("--input-dir", default=DEFAULT_INPUT_DIR)
+    parser.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR)
 
-    parser.add_argument("--style-images", required=True,
-                        help="Comma-separated style images (required)")
+    # Option A: style folders
+    parser.add_argument("--style-set", required=True,
+                        help="Name of style folder under input_images/styles/")
+    parser.add_argument("--style-glob", default="*",
+                        help="Glob pattern for style images (default: all)")
+
+    # Optional content images (img2img)
     parser.add_argument("--content-images", default="",
-                        help="Comma-separated content images (optional)")
+                        help="Comma-separated content images in input_images/content/")
 
     parser.add_argument("--steps", type=int, default=30)
     parser.add_argument("--guidance", type=float, default=7.0)
@@ -103,7 +105,7 @@ def main():
     parser.add_argument("--num-images", type=int, default=1)
     parser.add_argument("--seed", type=int, default=-1)
 
-    parser.add_argument("--dtype", choices=["fp16", "fp32"], default="fp16")
+    parser.add_argument("--dtype", choices=["fp16", "bf16", "fp32"], default="fp16")
 
     args = parser.parse_args()
 
@@ -111,21 +113,42 @@ def main():
     output_dir = Path(args.output_dir)
     ensure_dir(output_dir)
 
-    # ---------- Load style images ----------
-    style_files = csv_list(args.style_images)
-    style_imgs = [load_rgb(input_dir / f) for f in style_files]
+    # ---------------- Load style set ----------------
+    style_dir = input_dir / STYLES_ROOT / args.style_set
+    if not style_dir.exists():
+        raise SystemExit(f"ERROR: style-set not found: {style_dir}")
+
+    style_imgs: List[Image.Image] = []
+    for p in sorted(style_dir.glob(args.style_glob)):
+        if p.suffix.lower() in SUPPORTED_EXTS and p.is_file():
+            style_imgs.append(load_rgb(p))
+
+    if not style_imgs:
+        raise SystemExit(f"ERROR: no images found in style-set: {style_dir}")
+
     style_image = blend_style_images(style_imgs)
 
-    # ---------- Content images ----------
-    content_files = csv_list(args.content_images)
-    content_imgs = [load_rgb(input_dir / f) for f in content_files]
+    # ---------------- Content images ----------------
+    content_imgs: List[Image.Image] = []
+    if args.content_images:
+        content_dir = input_dir / "content"
+        for name in args.content_images.split(","):
+            p = content_dir / name.strip()
+            if not p.exists():
+                raise SystemExit(f"ERROR: content image not found: {p}")
+            content_imgs.append(load_rgb(p))
+
     use_img2img = len(content_imgs) > 0
 
-    # ---------- Torch setup ----------
-    torch_dtype = torch.float16 if args.dtype == "fp16" else torch.float32
+    # ---------------- Torch setup ----------------
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    torch_dtype = (
+        torch.float16 if args.dtype == "fp16"
+        else torch.bfloat16 if args.dtype == "bf16"
+        else torch.float32
+    )
 
-    # ---------- Pipeline ----------
+    # ---------------- Pipeline ----------------
     if use_img2img:
         pipe = StableDiffusionXLImg2ImgPipeline.from_pretrained(
             DEFAULT_MODEL, torch_dtype=torch_dtype
@@ -137,7 +160,6 @@ def main():
 
     pipe.to(device)
 
-    # ---------- IP-Adapter ----------
     pipe.load_ip_adapter(
         IPADAPTER_REPO,
         subfolder=IPADAPTER_SUBFOLDER,
@@ -145,12 +167,12 @@ def main():
     )
     pipe.set_ip_adapter_scale(args.style_scale)
 
-    # ---------- Seed ----------
     generator = None
     if args.seed != -1:
         generator = torch.Generator(device=device).manual_seed(args.seed)
 
-    def generate(init_image: Optional[Image.Image], tag: str):
+    # ---------------- Generate ----------------
+    def run(init_image: Optional[Image.Image], tag: str):
         for _ in range(args.num_images):
             result = pipe(
                 prompt=args.prompt,
@@ -163,15 +185,15 @@ def main():
                 generator=generator,
             )
             img = result.images[0]
-            name = timestamp_name(f"gen{tag}")
-            img.save(output_dir / name)
-            print("Saved:", output_dir / name)
+            out = output_dir / timestamp_name(f"gen{tag}")
+            img.save(out)
+            print("Saved:", out)
 
     if use_img2img:
-        for idx, img in enumerate(content_imgs):
-            generate(img, f"_from_{idx}")
+        for i, img in enumerate(content_imgs):
+            run(img, f"_from_{i}")
     else:
-        generate(None, "")
+        run(None, "")
 
 
 if __name__ == "__main__":
