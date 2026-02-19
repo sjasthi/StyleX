@@ -99,15 +99,6 @@ def generate_one(
     else:
         pipe = pipe.to("cuda" if use_cuda else "cpu")
 
-    # Optional LoRA weights for fine-tuning the model to better match the style. 
-    # If a LoRA path is specified in the style configuration, the LoRA weights will be loaded and applied to the pipeline with the given scale.
-    # LoRA (Low-Rank Adaptation) is a technique for fine-tuning large models like Stable Diffusion by learning low-rank updates to the model weights.
-    lora_path = getattr(style, "lora_path", "") or ""
-    if lora_path:
-        print(f"Applying LoRA: {lora_path}")
-        pipe.load_lora_weights(lora_path)
-        pipe.fuse_lora(lora_scale=getattr(style, "lora_scale", 0.8))
-
     prompt = build_prompt(user_prompt, style, style_keywords)
 
     call_kwargs = dict(

@@ -11,15 +11,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--prompt", required=True)
     parser.add_argument("--style", required=True, help="Name of a folder under input_images/")
-    parser.add_argument("--model", default="stabilityai/stable-diffusion-3.5-medium")
-    parser.add_argument("--steps", type=int, default=15)
-    parser.add_argument("--guidance", type=float, default=3.5)
+    parser.add_argument("--model", default="stabilityai/stable-diffusion-3.5-medium") # Default to SD 3.5 Medium for better performance and compatibility with limited VRAM. This model can produce good quality images while being more accessible for users without high-end GPUs. 
+    parser.add_argument("--steps", type=int, default=15) # Default to 15 steps for faster generation. This can be increased for higher quality at the cost of longer generation time, especially on CPU.
+    parser.add_argument("--guidance", type=float, default=3.5) # Higher guidance scale encourages the model to follow the prompt more closely, while lower values allow for more creativity and variation. The default of 3.5 is a good starting point for balancing prompt adherence and creativity.
     parser.add_argument("--height", type=int, default=512)
-    parser.add_argument("--width", type=int, default=512)
+    parser.add_argument("--width", type=int, default=512) # Default to 512x512 for better performance and compatibility with limited VRAM. 
+                                                          #This model can generate larger images but will require more GPU memory and may be slower, especially on a CPU.
 
-    parser.add_argument("--device", choices=["cuda", "cpu"], default="cuda")
-    parser.add_argument("--cpu-offload", action="store_true")
-    parser.add_argument("--no-t5", action="store_true")
+    parser.add_argument("--device", choices=["cuda", "cpu"], default="cuda") # Use --device cpu to run on CPU (not recommended due to slowness, but can be used for testing or if no GPU is available). The script will automatically check if CUDA is available when "cuda" is specified and fall back to CPU if not.
+    parser.add_argument("--cpu-offload", action="store_true") # Enable CPU offloading to reduce GPU memory usage. This will offload parts of the model to CPU when not in use, allowing it to run on GPUs with less VRAM. It may slow down generation but can help avoid out-of-memory errors on limited hardware.
+    parser.add_argument("--no-t5", action="store_true") # Disable the T5 text encoder and use CLIP text encoder instead. This can reduce VRAM usage and speed up generation, but may result in less accurate style keyword extraction. It can be useful for testing or if the T5 model is causing memory issues.
+
+    #Example usage:
+    #python -m src.main --prompt "A fantasy landscape with mountains and a river" --style "Van Gogh" --steps 20 --guidance 4.0 --device cuda --cpu-offload --no-t5
 
     args = parser.parse_args()
 
