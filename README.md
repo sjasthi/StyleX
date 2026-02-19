@@ -1,2 +1,73 @@
 # StyleX
 StyleX
+Ensure Python is installed on your machine
+    python --version (inside of the terminal)
+
+Intsall CUDA (if you have an NVIDIA GPU)
+    https://developer.nvidia.com/cuda-downloads
+
+In a terminal (powershell) create and activate a virtual environment
+    python -m venv env
+    .\env\Scripts\activate
+
+Install the required packages
+    pip install -r requirements.txt
+
+Install PyTorch
+    https://pytorch.org/get-started/locally/
+    Follow Website instructions
+
+Create Hugging Face Account
+    After logging in, go to account settings and generate an access token
+    Then run 'hf auth login' (remove the ' surrounding hf auth login) and paste your access token when prompted
+
+Optional (You may have to or may not) Request Access to High End Models
+    Follow the instructions on the link: https://huggingface.co/stabilityai/stable-diffusion-3.5-large
+
+Make sure your project looks like this: 
+
+StyleX/
+  src/
+    main.py
+    generate.py
+    style_embed.py
+    styles.py
+    utils.py
+  input_images/
+    anime/
+      (put reference images here)
+    cyberpunk/
+      (put reference images here)
+  output_images/
+    (auto-created)
+
+Add reference images 
+    input_images/anime/
+    img1.jpg
+    img2.png
+    img3.webp
+
+Run an image generation: 
+ python -m src.main --prompt "a dog in a park, sunny day" --style anime
+    The CLI supports --steps, --guidance, --height, --width, --device, --cpu-offload, --no-t5
+    Changes can be made to these to help improve the generation time
+        Examples: 
+            python -m src.main --prompt "portrait photo" --style anime --device cpu
+            python -m src.main --prompt "cyberpunk city street" --style cyberpunk --steps 20 --height 768 --width 768
+
+Images are saved: 
+    output_images/<style_name>/
+
+How styles are applied:
+    Extracts keywords from the style folder images using CLIP (embeddings).
+    Appends those keywords to your prompt. 
+    Runs SD3.5 to generate the image
+    The terminal will displayed the extracted keywords
+
+Cache behavior
+    Keywords are cached per style folder in:
+        input_images/<style>/.style_keywords_cache.json
+    So repeated runs are faster
+
+Issues you may run into:
+    Lack of memory (Solutions: Change the height and width of the image, use less steps, offload to the cpu which helps VRAM usage)

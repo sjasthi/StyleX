@@ -22,8 +22,50 @@ Create Hugging Face Account
 Optional (You may have to or may not) Request Access to High End Models
     Follow the instructions on the link: https://huggingface.co/stabilityai/stable-diffusion-3.5-large
 
-Run 3-5.py
-    python src\3-5.py  
+Make sure your project looks like this: 
 
-Changing the prompt
-    Inside the 3-5.py prompt = "" (Change prompt to what you would like) 
+StyleX/
+  src/
+    main.py
+    generate.py
+    style_embed.py
+    styles.py
+    utils.py
+  input_images/
+    anime/
+      (put reference images here)
+    cyberpunk/
+      (put reference images here)
+  output_images/
+    (auto-created)
+
+Add reference images 
+    input_images/anime/
+    img1.jpg
+    img2.png
+    img3.webp
+
+Run an image generation: 
+ python -m src.main --prompt "a dog in a park, sunny day" --style anime
+    The CLI supports --steps, --guidance, --height, --width, --device, --cpu-offload, --no-t5
+    Changes can be made to these to help improve the generation time
+        Examples: 
+            python -m src.main --prompt "portrait photo" --style anime --device cpu
+            python -m src.main --prompt "cyberpunk city street" --style cyberpunk --steps 20 --height 768 --width 768
+
+Images are saved: 
+    output_images/<style_name>/
+
+How styles are applied:
+    Extracts keywords from the style folder images using CLIP (embeddings).
+    Appends those keywords to your prompt. 
+    Runs SD3.5 to generate the image
+    The terminal will displayed the extracted keywords
+
+Cache behavior
+    Keywords are cached per style folder in:
+        input_images/<style>/.style_keywords_cache.json
+    So repeated runs are faster
+
+Issues you may run into:
+    Lack of memory (Solutions: Change the height and width of the image, use less steps, offload to the cpu which helps VRAM usage)
