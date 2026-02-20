@@ -1,2 +1,20 @@
 env/
 3.5/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# macOS junk
+.DS_Store
+
+# Generated outputs
+output_images/
+
+# Style keyword cache
+input_images/**/.style_keywords_cache.json
