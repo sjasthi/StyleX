@@ -1,0 +1,21 @@
+Place your prompt.txt file inside this directory
+
+File format can either be separated by blank lines
+
+    Example:
+            Cyberpunk city at sunrise, glowing skyscrapers, ultra detailed
+
+            Rain-soaked neon street at night, cinematic lighting
+Or
+
+Line mode where each non empty line is treated as a sepertae prompt
+
+    Example:
+            Cyberpunk city at sunrise
+            Neon-lit alleyway in the rain
+            Futuristic skyline with flying cars
+
+To run batch generation:
+
+    Example:
+            python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk --height 512 --width 512 --steps 30 --guidance 4.0 --cpu-offload --no-t5
