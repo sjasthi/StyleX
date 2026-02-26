@@ -23,7 +23,6 @@ def main():
     parser.add_argument("--no-t5", action="store_true") # Disable the T5 text encoder and use CLIP text encoder instead. This can reduce VRAM usage and speed up generation, but may result in less accurate style keyword extraction. It can be useful for testing or if the T5 model is causing memory issues.
 
     parser.add_argument("--prompts-file", type=str, default=None, help="Path to a .txt file containing multiple prompts.")  # Optional argument that specifies a text file that has multiple prompts. The prompts will be parsed according to the specified mode (line or blankline)
-    parser.add_argument("--prompts-mode", type=str, default="blankline", choices=["line", "blankline"], help="How to parse prompts in the prompts file.") # If --prompts-file is provided, this option specifies how to parse the prompts from the file. "line" mode treats each non-empty line as a separate prompt, while "blankline" mode treats blocks of text separated by blank lines as individual prompts. The default is "blankline", which allows for multi-line prompts that can be more descriptive and detailed, while "line" mode is simpler and more concise for shorter prompts.
    
     #Example usage:
     #python -m src.main --prompt "A fantasy landscape with mountains and a river" --style "Van Gogh" --steps 20 --guidance 4.0 --device cuda --cpu-offload --no-t5
@@ -36,7 +35,7 @@ def main():
 
     # Load prompts from the specified file if provided, otherwise use the single prompt string. 
     if args.prompts_file:
-        prompts = read_prompts(Path(args.prompts_file), mode=args.prompts_mode)
+        prompts = read_prompts(Path(args.prompts_file))
     else:
         prompts = [args.prompt]
 

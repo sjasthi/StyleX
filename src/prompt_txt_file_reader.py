@@ -4,34 +4,42 @@ from typing import List
 
 def read_prompts(
     path: Path,
-    mode: str = "blankline",   # a line or a blank line
+    mode: str = "blankline",   # a line or a blank line, or a hash
 ) -> List[str]:
     text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
 
-    if mode == "line":
-        prompts = []
-        for line in text.splitlines():
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            prompts.append(line)
-        return prompts
+    def is_hash_separator(line: str) -> bool:
+        s = line.strip()
+        return bool(s) and set(s) == {"#"}  # "#", "##", "###" etc.
 
-    if mode == "blankline":
-        blocks = []
+    if any(is_hash_separator(l) for l in lines):
+        blocks: list[str] = []
         current: list[str] = []
-        for raw in text.splitlines():
-            line = raw.rstrip()
-            if line.strip().startswith("#"):
+        for raw in lines:
+            if is_hash_separator(raw):
+                if current:
+                    blocks.append("\n".join(current).strip())
+                    current = []
                 continue
-            if line.strip() == "":
+            if raw.strip() == "":
+                continue
+            current.append(raw.rstrip())
+        if current:
+            blocks.append("\n".join(current).strip())
+        return [b for b in blocks if b]
+    if any(l.strip() == "" for l in lines):
+        blocks: list[str] = []
+        current = []
+        for raw in lines:
+            if raw.strip() == "":
                 if current:
                     blocks.append("\n".join(current).strip())
                     current = []
             else:
-                current.append(line)
+                current.append(raw.rstrip())
         if current:
             blocks.append("\n".join(current).strip())
         return [b for b in blocks if b]
-
-    raise ValueError("mode must be 'line' or 'blankline'")
+    prompts = [l.strip() for l in lines if l.strip() != ""]
+    return prompts
