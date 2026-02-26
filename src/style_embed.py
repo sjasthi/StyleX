@@ -1,5 +1,5 @@
 from __future__ import annotations
-# Embedding-based "style extraction" from reference images (No IP-Adapter).
+# Embedding-based "style extraction" from reference images.
 
 # Idea:
 # - Compute an image embedding for each reference image in input_images/<style>/
@@ -120,6 +120,11 @@ STYLE_VOCAB: list[str] = [
     "expressive character",
     "clean coloring",
     "illustration style shading",
+    "outer space scene",
+    "cosmic nebula",
+    "starscape background",
+    "planet surface details",
+    "picasso style",
 ]
 
 

@@ -16,8 +16,7 @@ def main():
     parser.add_argument("--steps", type=int, default=15) # Default to 15 steps for faster generation. This can be increased for higher quality at the cost of longer generation time, especially on CPU.
     parser.add_argument("--guidance", type=float, default=3.5) # Higher guidance scale encourages the model to follow the prompt more closely, while lower values allow for more creativity and variation. The default of 3.5 is a good starting point for balancing prompt adherence and creativity.
     parser.add_argument("--height", type=int, default=512)
-    parser.add_argument("--width", type=int, default=512) # Default to 512x512 for better performance and compatibility with limited VRAM. 
-                                                          #This model can generate larger images but will require more GPU memory and may be slower, especially on a CPU.
+    parser.add_argument("--width", type=int, default=512) # Default to 512x512 for better performance and compatibility with limited VRAM. #This model can generate larger images but will require more GPU memory and may be slower, especially on a CPU.
 
     parser.add_argument("--device", choices=["cuda", "cpu"], default="cuda") # Use --device cpu to run on CPU (not recommended due to slowness, but can be used for testing or if no GPU is available). The script will automatically check if CUDA is available when "cuda" is specified and fall back to CPU if not.
     parser.add_argument("--cpu-offload", action="store_true") # Enable CPU offloading to reduce GPU memory usage. This will offload parts of the model to CPU when not in use, allowing it to run on GPUs with less VRAM. It may slow down generation but can help avoid out-of-memory errors on limited hardware.
