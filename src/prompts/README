@@ -1,19 +1,25 @@
-Place your prompt.txt file inside this directory
+Place your prompt.txt file inside this directory (Batch Prompts)
 
-File format can either be separated by blank lines
-
-    Example:
-            Cyberpunk city at sunrise, glowing skyscrapers, ultra detailed
-
-            Rain-soaked neon street at night, cinematic lighting
-Or
-
-Line mode where each non empty line is treated as a sepertae prompt
+File format each prompt is separated by '#'
 
     Example:
-            Cyberpunk city at sunrise
-            Neon-lit alleyway in the rain
-            Futuristic skyline with flying cars
+    
+        #
+        Daytime cyberpunk city, futuristic megacity under bright daylight, towering high-tech skyscrapers, holographic advertisements visible in daylight, ultra detailed, wide angle view
+        #
+        Rain-soaked neon street at night, glowing pink and blue lights reflecting on wet pavement, cyberpunk marketplace, people with augmented reality visors, cinematic atmosphere
+        #
+        Cyberpunk samurai standing on a rooftop overlooking a futuristic skyline, glowing katana blade, neon signs in the distance, dramatic lighting, dynamic pose
+
+        #
+        Futuristic hacker workspace filled with holographic screens,
+        floating UI elements, glowing keyboards, dark room illuminated 
+        by blue neon light, detailed environment
+        #
+
+    This Prompt file has 4 different prompts which will be reader by the prompt_txt_file_reader.py file
+
+  
 
 To run batch generation:
 
