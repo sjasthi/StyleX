@@ -1,12 +1,10 @@
 from __future__ import annotations
-# Embedding-based "style extraction" from reference images.
-
-# Idea:
+# Embedding-based "style extraction" from reference images 
+# Main Idea:
 # - Compute an image embedding for each reference image in input_images/<style>/
 # - Average them -> style embedding
 # - Compare to a curated list of style descriptors using text embeddings
 # - Pick top-k descriptors and append them to the generation prompt
-
 # Default backbone: CLIP ViT-B/32 (Can run on CPU or GPU).
 
 

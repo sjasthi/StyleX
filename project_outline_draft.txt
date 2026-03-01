@@ -37,7 +37,12 @@ Your python code relies on "style" directory and this prompt.txt to generate mul
 
 Make sure that all  of you are in sync and the code is prompted to github main branch.
 
-============ FP 6, FP 7, FP 8 and FP 9 ============
+============ FP6 ============
+
+Convert the existing code to build Google Colab Version
+
+
+============  FP 7, FP 8 and FP 9 ============
 Converting the python script into Web UI / using Flask
 
 
