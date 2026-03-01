@@ -1,6 +1,6 @@
 Place your prompt.txt file inside this directory (Batch Prompts)
 
-File format each prompt is separated by '#'
+File format each prompt is separated by '#' (Note that you can use many '#' to separate each prompt not just one)
 
     Example:
     
