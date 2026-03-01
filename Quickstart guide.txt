@@ -59,18 +59,36 @@ Run an image generation:
         Examples: 
             python -m src.main --prompt "portrait photo" --style anime --device cpu
             python -m src.main --prompt "cyberpunk city street" --style cyberpunk --steps 20 --height 768 --width 768
+
+
     Batch prompts:
-        1. Create a .txt file that has all the prompts you want to generate
-            Each prompt can be one per line(--prompt-mode blackline)
-                            or
-            Separated by blank lines(--prompt-mode blackline, which is the default for this program)
+        1.   File format each prompt is separated by '#' (Note that you can use many '#' to separate each prompt not just one)
+
+        Example:
+        
+            #
+            Daytime cyberpunk city, futuristic megacity under bright daylight, towering high-tech skyscrapers, holographic advertisements visible in daylight, ultra detailed, wide angle view
+            #
+            Rain-soaked neon street at night, glowing pink and blue lights reflecting on wet pavement, cyberpunk marketplace, people with augmented reality visors, cinematic atmosphere
+            #
+            Cyberpunk samurai standing on a rooftop overlooking a futuristic skyline, glowing katana blade, neon signs in the distance, dramatic lighting, dynamic pose
+
+            #
+            Futuristic hacker workspace filled with holographic screens,
+            floating UI elements, glowing keyboards, dark room illuminated 
+            by blue neon light, detailed environment
+            #
+
+        This Prompt file has 4 different prompts which will be reader by the prompt_txt_file_reader.py file
+
         2. Place the file anywhere in the project
         3. Then run the program while being sure to include the path to the file in the command.
         Examples: 
             If your file is in a prompts folder:
                 .txt location: src/prompts/cyberpunk_batch_prompts.txt
                 You would run this: python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk --height 512 --width 512 --steps 30 --guidance 4.0 --cpu-offload --no-t5
-
+                
+                
 Images are saved: 
     output_images/<style_name>/
 
@@ -86,4 +104,8 @@ Cache behavior
     So repeated runs are faster
 
 Issues you may run into:
-    Lack of memory (Solutions: Change the height and width of the image, use less steps, offload to the cpu which helps VRAM usage)
+
+    Lack of memory (Solutions: Change the height and width of the image, use less steps, offload to the cpu which helps VRAM usage) 
+
+
+    Not having an NVIDIA GPU (Solution: Use Google Colab to avoid this issue and still run the program in a reasonable time)
