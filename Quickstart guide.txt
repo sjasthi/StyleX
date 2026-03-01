@@ -1,4 +1,3 @@
-# StyleX
 StyleX
 Ensure Python is installed on your machine
     python --version (inside of the terminal)
@@ -60,6 +59,17 @@ Run an image generation:
         Examples: 
             python -m src.main --prompt "portrait photo" --style anime --device cpu
             python -m src.main --prompt "cyberpunk city street" --style cyberpunk --steps 20 --height 768 --width 768
+    Batch prompts:
+        1. Create a .txt file that has all the prompts you want to generate
+            Each prompt can be one per line(--prompt-mode blackline)
+                            or
+            Separated by blank lines(--prompt-mode blackline, which is the default for this program)
+        2. Place the file anywhere in the project
+        3. Then run the program while being sure to include the path to the file in the command.
+        Examples: 
+            If your file is in a prompts folder:
+                .txt location: src/prompts/cyberpunk_batch_prompts.txt
+                You would run this: python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk --height 512 --width 512 --steps 30 --guidance 4.0 --cpu-offload --no-t5
 
 Images are saved: 
     output_images/<style_name>/

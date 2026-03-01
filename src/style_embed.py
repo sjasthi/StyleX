@@ -118,6 +118,11 @@ STYLE_VOCAB: list[str] = [
     "expressive character",
     "clean coloring",
     "illustration style shading",
+    "outer space scene",
+    "cosmic nebula",
+    "starscape background",
+    "planet surface details",
+    "picasso style",
 ]
 
 
