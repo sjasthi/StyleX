@@ -40,7 +40,7 @@ def generate_one(
     user_prompt: str,
     style: Style,
     out_root: Path,
-    steps: int = 20,
+    steps: int = 30,
     guidance: float = 5.0,
     height: int = 512,
     width: int = 512,

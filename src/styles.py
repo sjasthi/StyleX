@@ -8,7 +8,7 @@ class Style:
     name: str
     folder: Path
     use_style_embeddings: bool = True
-    embeddings_top_k: int = 15
+    embeddings_top_k: int = 10 # Number of top style keywords to extract from reference images for prompt enhancement. Limit to top 10 to avoid overly long prompts because stable-diffusion-3.5-medium has a max token limit of 75 for the combined prompt (user + style keywords).
     embeddings_model_id: str = "openai/clip-vit-base-patch32"
 
 
