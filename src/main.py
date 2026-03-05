@@ -19,8 +19,6 @@ def main():
     parser.add_argument("--width", type=int, default=512) # Default to 512x512 for better performance and compatibility with limited VRAM. #This model can generate larger images but will require more GPU memory and may be slower, especially on a CPU.
 
     parser.add_argument("--device", choices=["cuda", "cpu"], default="cuda") # Use --device cpu to run on CPU (not recommended due to slowness, but can be used for testing or if no GPU is available). The script will automatically check if CUDA is available when "cuda" is specified and fall back to CPU if not.
-    parser.add_argument("--cpu-offload", action="store_true") # Enable CPU offloading to reduce GPU memory usage. This will offload parts of the model to CPU when not in use, allowing it to run on GPUs with less VRAM. It may slow down generation but can help avoid out-of-memory errors on limited hardware.
-    parser.add_argument("--no-t5", action="store_true") # Disable the T5 text encoder and use CLIP text encoder instead. This can reduce VRAM usage and speed up generation, but may result in less accurate style keyword extraction. It can be useful for testing or if the T5 model is causing memory issues.
 
     parser.add_argument("--prompts-file", type=str, default=None, help="Path to a .txt file containing multiple prompts.")  # Optional argument that specifies a text file that has multiple prompts. The prompts will be parsed according to the specified mode (line or blankline)
    
@@ -86,8 +84,6 @@ def main():
             height=args.height,
             width=args.width,
             device=args.device,
-            cpu_offload=args.cpu_offload,
-            no_t5=args.no_t5,
         )
 
         # generate_one returns list[Path]; handle either case safely

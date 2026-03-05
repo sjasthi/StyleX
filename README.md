@@ -55,7 +55,7 @@ Add reference images
 
 Run an image generation: 
  python -m src.main --prompt "a dog in a park, sunny day" --style anime
-    The CLI supports --steps, --guidance, --height, --width, --device, --cpu-offload, --no-t5
+    The CLI supports --steps, --guidance, --height, --width, --device,
     Changes can be made to these to help improve the generation time
         Examples: 
             python -m src.main --prompt "portrait photo" --style anime --device cpu
@@ -87,7 +87,7 @@ Run an image generation:
         Examples: 
             If your file is in a prompts folder:
                 .txt location: src/prompts/cyberpunk_batch_prompts.txt
-                You would run this: python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk --height 512 --width 512 --steps 30 --guidance 4.0 --cpu-offload --no-t5
+                You would run this: python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk --height 512 --width 512 --steps 30 --guidance 4.0 
                 
                 
 Images are saved: 
