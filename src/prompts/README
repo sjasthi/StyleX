@@ -1,27 +1,29 @@
 Place your prompt.txt file inside this directory (Batch Prompts)
 
-File format each prompt is separated by '#' (Note that you can use many '#' to separate each prompt not just one)
+Example:
 
-    Example:
-    
-        #
-        Daytime cyberpunk city, futuristic megacity under bright daylight, towering high-tech skyscrapers, holographic advertisements visible in daylight, ultra detailed, wide angle view
-        #
-        Rain-soaked neon street at night, glowing pink and blue lights reflecting on wet pavement, cyberpunk marketplace, people with augmented reality visors, cinematic atmosphere
-        #
-        Cyberpunk samurai standing on a rooftop overlooking a futuristic skyline, glowing katana blade, neon signs in the distance, dramatic lighting, dynamic pose
+    #
+    Daytime cyberpunk city, futuristic megacity under bright daylight, towering high-tech skyscrapers, holographic advertisements visible in daylight, ultra detailed, wide angle view
+    #
+    Rain-soaked neon street at night, glowing pink and blue lights reflecting on wet pavement, cyberpunk marketplace, people with augmented reality visors, cinematic atmosphere
+    #
+    Cyberpunk samurai standing on a rooftop overlooking a futuristic skyline, glowing katana blade, neon signs in the distance, dramatic lighting, dynamic pose
 
-        #
-        Futuristic hacker workspace filled with holographic screens,
-        floating UI elements, glowing keyboards, dark room illuminated 
-        by blue neon light, detailed environment
-        #
+    #
+    Futuristic hacker workspace filled with holographic screens,
+    floating UI elements, glowing keyboards, dark room illuminated 
+    by blue neon light, detailed environment
+    #
 
-    This Prompt file has 4 different prompts which will be reader by the prompt_txt_file_reader.py file
+This Prompt file has 4 different prompts which will be reader by the prompt_txt_file_reader.py file
 
-  
+2. (Alternative) Place the prompt file anywhere in the project
+3. Then run the program while being sure to include the path to the file in the command.
 
-To run batch generation:
+Examples: 
+    If your file is in a prompts folder (VS Code):
+        .txt location: src/prompts/cyberpunk_batch_prompts.txt
+        You would run this: python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk 
 
-    Example:
-            python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk --height 512 --width 512 --steps 30 --guidance 4.0 --cpu-offload --no-t5
+Google Colab:
+    !python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk 
