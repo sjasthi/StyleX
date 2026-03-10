@@ -1,111 +1,143 @@
-StyleX
-Ensure Python is installed on your machine
-    python --version (inside of the terminal)
+# StyleX
 
-Intsall CUDA (if you have an NVIDIA GPU)
-    https://developer.nvidia.com/cuda-downloads
+StyleX 
 
-In a terminal (powershell) create and activate a virtual environment
-    python -m venv env
-    .\env\Scripts\activate
+Installation:
 
-Install the required packages
-    pip install -r requirements.txt
+    Version 1 (VS Code Installation)
 
-Install PyTorch
-    https://pytorch.org/get-started/locally/
-    Follow Website instructions
-       Make sure to have these version:
-            torch: 2.10.0+cu130
-            cuda available: True
-            cuda version: 13.0
-        Verify version with this command:
-            python -c "import torch; print('torch:', torch.__version__); print('cuda available:', torch.cuda.is_available()); print('cuda version:', torch.version.cuda)"
+    1. Clone the repository
+        git clone https://github.com/sjasthi/StyleX.git (Clone to repo)
+        cd StyleX (Change into the project directory)
 
-Create Hugging Face Account
-    After logging in, go to account settings and generate an access token
-    Then run 'hf auth login' (remove the ' surrounding hf auth login) and paste your access token when prompted
+    2. Create a virtual environment
 
-Optional (You may have to or may not) Request Access to High End Models
-    Follow the instructions on the link: https://huggingface.co/stabilityai/stable-diffusion-3.5-large
+        Windows: 
+            python -m venv env (create the virtual environment)
+            env\Scripts\activate (activate the virtual environment)
 
-Make sure your project looks like this: 
+        Mac/Linux:
+            python -m venv env (create the virtual environment)
+            source env/bin/activate (activate the virtual environment)
 
-StyleX/
-  src/
-    main.py
-    generate.py
-    style_embed.py
-    styles.py
-    utils.py
-  input_images/
-    anime/
-      (put reference images here)
-    cyberpunk/
-      (put reference images here)
-  output_images/
-    (auto-created)
+    3. Install the dependencies
 
-Add reference images 
-    input_images/anime/
-    img1.jpg
-    img2.png
-    img3.webp
+        python -m pip install -r requirements.txt
 
-Run an image generation: 
- python -m src.main --prompt "a dog in a park, sunny day" --style anime
-    The CLI supports --steps, --guidance, --height, --width, --device, --cpu-offload, --no-t5
-    Changes can be made to these to help improve the generation time
-        Examples: 
-            python -m src.main --prompt "portrait photo" --style anime --device cpu
-            python -m src.main --prompt "cyberpunk city street" --style cyberpunk --steps 20 --height 768 --width 768
+    Version 2 (Google Colab - *This method of running the program is recommended*)
 
+    1. Go to Google Colab
+        https://colab.research.google.com
+         Set your runtime type to GPU
 
-    Batch prompts:
-        1.   File format each prompt is separated by '#' (Note that you can use many '#' to separate each prompt not just one)
+    2. Clone the Repo (Run as one cell)
+        !git clone https://github.com/sjasthi/StyleX.git
+        %cd StyleX
 
-        Example:
+    3. Install the dependencies (These may already be installed in Google Colab but this is just to be sure) (Run as one cell)
+        !pip install -q git+https://github.com/huggingface/diffusers.git
+        !pip install -q transformers accelerate safetensors
+        !pip install -q pillow numpy huggingface-hub
+
+    4. Mount to your Google Drive (Run as one cell)
+        from google.colab import drive
+        drive.mount("/content/drive")
+
+    5. Create a Google Drive folder called StyleX_Input_Images (Or name it whatever you would like)
+        Inside this folder create another folder that will hold your style image references
+
+    6. Remove any existing input_images folders (So you can use the Google Drive one)
+        !rm -rf input_images
+
+    7. Create a symlink (This is a shortcut that points to your style_input_images folder)
+        !ln -s "/content/drive/MyDrive/StyleX_Input_Images" input_images (You may need to change the "StyleX_Input_Images" to whatever you named it to)
+
+    8. Check that the symlink worked
+        !ls input_images (You should see all your input image folders after running this)
+
+    9. Login into the Hugging Face using your token (To get a token go to the Hugging Face website and create an account and create an access token and give it permission to "Read access to contents of all public gated repos you can access")
+        from huggingface_hub import notebook_login
+        notebook_login()
+
+How to use the program:
+
+    Generate a single image (VS Code): 
+
+        Example: 
         
-            #
-            Daytime cyberpunk city, futuristic megacity under bright daylight, towering high-tech skyscrapers, holographic advertisements visible in daylight, ultra detailed, wide angle view
-            #
-            Rain-soaked neon street at night, glowing pink and blue lights reflecting on wet pavement, cyberpunk marketplace, people with augmented reality visors, cinematic atmosphere
-            #
-            Cyberpunk samurai standing on a rooftop overlooking a futuristic skyline, glowing katana blade, neon signs in the distance, dramatic lighting, dynamic pose
+        python -m src.main --style anime --prompt "A cyberpunk samurai walking through neon Tokyo"
 
-            #
-            Futuristic hacker workspace filled with holographic screens,
-            floating UI elements, glowing keyboards, dark room illuminated 
-            by blue neon light, detailed environment
-            #
+                                                or
 
-        This Prompt file has 4 different prompts which will be reader by the prompt_txt_file_reader.py file
+        Example (This is a full command example): 
 
-        2. Place the file anywhere in the project
-        3. Then run the program while being sure to include the path to the file in the command.
-        Examples: 
-            If your file is in a prompts folder:
-                .txt location: src/prompts/cyberpunk_batch_prompts.txt
-                You would run this: python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk --height 512 --width 512 --steps 30 --guidance 4.0 --cpu-offload --no-t5
-                
-                
-Images are saved: 
-    output_images/<style_name>/
+        python -m src.main --model "black-forest-labs/FLUX.2-klein-4B" --style abcd --prompt "A scientist working at a futuristic AI laboratory" --steps 8 --guidance 1.0 --height 1024 --width 1024 --cpu-offload
 
-How styles are applied:
-    Extracts keywords from the style folder images using CLIP (embeddings).
-    Appends those keywords to your prompt. 
-    Runs SD3.5 to generate the image
-    The terminal will displayed the extracted keywords
+    Generate a single image (Google Colab): 
 
-Cache behavior
-    Keywords are cached per style folder in:
-        input_images/<style>/.style_keywords_cache.json
-    So repeated runs are faster
+        Example: !python -m src.main --style anime --prompt "A cyberpunk samurai walking through neon Tokyo"
 
-Issues you may run into:
+                                                or
 
-    Lack of memory (Solutions: Change the height and width of the image, use less steps, offload to the cpu which helps VRAM usage) 
+        Example (This is a full command example): 
+
+        !python -m src.main --model "black-forest-labs/FLUX.2-klein-4B" --style abcd --prompt "A scientist working at a futuristic AI laboratory" --steps 8 --guidance 1.0 --height 1024 --width 1024 --cpu-offload
+
+You can run this program without reference images to determine if your images are being used: 
+
+    Example (VS Code): 
+        python -m src.main --style anime --prompt "a futuristic city skyline at sunset" --no-ref-images
+
+    Example (Google Colab): 
+        !python -m src.main --style anime --prompt "a futuristic city skyline at sunset" --no-ref-images
 
 
-    Not having an NVIDIA GPU (Solution: Use Google Colab to avoid this issue and still run the program in a reasonable time)
+Batch prompts:
+    1.   File format each prompt is separated by '#' (Note that you can use many '#' to separate each prompt not just one)
+
+    Example:
+    
+        #
+        Daytime cyberpunk city, futuristic megacity under bright daylight, towering high-tech skyscrapers, holographic advertisements visible in daylight, ultra detailed, wide angle view
+        #
+        Rain-soaked neon street at night, glowing pink and blue lights reflecting on wet pavement, cyberpunk marketplace, people with augmented reality visors, cinematic atmosphere
+        #
+        Cyberpunk samurai standing on a rooftop overlooking a futuristic skyline, glowing katana blade, neon signs in the distance, dramatic lighting, dynamic pose
+
+        #
+        Futuristic hacker workspace filled with holographic screens,
+        floating UI elements, glowing keyboards, dark room illuminated 
+        by blue neon light, detailed environment
+        #
+
+    This Prompt file has 4 different prompts which will be reader by the prompt_txt_file_reader.py file
+
+    2. Place the file anywhere in the project
+    3. Then run the program while being sure to include the path to the file in the command.
+
+    Examples: 
+        If your file is in a prompts folder (VS Code):
+            .txt location: src/prompts/cyberpunk_batch_prompts.txt
+            You would run this: python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk 
+
+    Google Colab:
+        !python -m src.main --prompts-file src/prompts/cyberpunk_batch_prompts.txt --style cyberpunk 
+
+
+Output:
+
+    All generate images are saved automatically to: output_images/<style_name>/
+
+    Example: 
+        output_images/anime/
+            20260305_154332_01.png
+            20260305_154332_02.png
+
+How Style Conditioning Works:
+
+    Images from the style folder are loaded
+    A subset of images is selected (aka a max of 10 images (by default) or whatever you specify) (NOTE: It is important to note that many images can cause undesirable outputs)
+    Images are passed to the FLUX pipeline as conditioning inputs
+    The model generates images influenced by those references. 
+
+
