@@ -27,7 +27,6 @@ Project Structure:
         -generate.py
         -styles.py
         -prompt_txt_file_reader.py
-        -ref_scoring.py
         -utils.py
 
     -input_images/
