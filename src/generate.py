@@ -1,22 +1,18 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
-
 import torch
 from PIL import Image
-
-from .ref_scoring import score_candidates_against_refs
 from .styles import Style
 from .utils import timestamp
 
 IMG_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
 
-# This module implements the core generation logic, including loading the FLUX.2 pipeline, preparing reference images, generating candidate images, scoring and ranking them against the reference images, and saving the top-ranked outputs to disk. 
-# The main function is 'generate_one', which takes a user prompt, a Style object, an output directory, and a GenerateConfig object with all the relevant settings for the generation process. 
-# The function returns a list of Paths to the saved output images. 
-# The code is structured to be modular and extensible, allowing for easy adjustments to the generation parameters and scoring mechanisms as needed.
+# This file contains the core logic for generating images based on user prompts and styles. 
+# It defines the GenerateConfig dataclass to hold configuration parameters for the generation process, and the generate_one function that performs the actual image generation using a specified model and style. 
+# The code also includes helper functions to list images in a folder, load images using PIL, and pick reference images from a style folder based on specified criteria. 
+# The generate_one function handles the setup of the generation pipeline, including loading the model, preparing reference images if needed, and saving the generated images to the output directory.
 def _list_images(folder: Path) -> List[Path]:
     if not folder.exists():
         return []
@@ -55,7 +51,7 @@ def _pick_reference_images(
     return [_load_pil(p) for p in chosen]
 
 # The generate_one function is the main entry point for generating images based on a user prompt and a specified style. 
-# It handles the entire generation pipeline, including loading the FLUX.2 model, preparing reference images, generating candidate images, scoring and ranking them, and saving the top-ranked outputs to disk.
+# It handles the entire generation pipeline, including loading the FLUX.2 model, preparing reference images.
 @dataclass
 class GenerateConfig:
     model_id: str
@@ -70,20 +66,9 @@ class GenerateConfig:
     ref_max_images: int = 10
     ref_sample_mode: str = "random"
     seed: Optional[int] = None
+    num_outputs: int = 1
 
-    num_outputs: int = 4
 
-    rank_outputs: bool = True
-    keep_top_k: int = 1
-    use_clip_score: bool = True
-    use_siglip_score: bool = True
-    use_dino_score: bool = True
-    clip_weight: float = 0.4
-    siglip_weight: float = 0.4
-    dino_weight: float = 0.2
-    score_dtype: torch.dtype = torch.float32
-
-# The code includes helper functions to determine if a given model_id corresponds to a FLUX.2 model and to load the appropriate FLUX.2 pipeline based on the model_id.
 def _is_flux2(model_id: str) -> bool:
     mid = model_id.lower()
     return "flux.2" in mid or "flux2" in mid
@@ -91,7 +76,7 @@ def _is_flux2(model_id: str) -> bool:
 # This function loads the FLUX.2 pipeline based on the specified model_id and configuration settings. It checks if the model_id corresponds to a FLUX.2 model and loads the appropriate pipeline class (Flux2KleinPipeline or Flux2Pipeline). 
 # It also handles moving the pipeline to the correct device (CPU or CUDA) and enabling CPU offload if specified in the configuration.
 def _load_flux2_pipeline(model_id: str, cfg: GenerateConfig):
-    from diffusers import Flux2KleinPipeline, Flux2Pipeline  
+    from diffusers import Flux2KleinPipeline, Flux2Pipeline
 
     if "klein" in model_id.lower():
         pipe = Flux2KleinPipeline.from_pretrained(model_id, torch_dtype=cfg.torch_dtype)
@@ -109,7 +94,7 @@ def _load_flux2_pipeline(model_id: str, cfg: GenerateConfig):
     return pipe
 
 # The generate_one function controls the entire image generation process for a single user prompt and style. 
-# It prepares the FLUX.2 pipeline, selects reference images, generates candidate images, scores and ranks them, and saves the top-ranked outputs to disk.
+# It prepares the FLUX.2 pipeline, selects reference images, and calls the pipeline to generate images based on the user prompt and reference images.
 def generate_one(
     user_prompt: str,
     style: Style,
@@ -126,8 +111,6 @@ def generate_one(
 
     pipe = _load_flux2_pipeline(cfg.model_id, cfg)
 
-# The function sets up the random seed for reproducibility if specified in the configuration. 
-# It creates a torch.Generator for both the main generation process and the reference image selection process, ensuring that the same seed is used for both to maintain consistency in the results.
     if cfg.seed is None:
         generator = None
         ref_gen = torch.Generator(device="cpu").manual_seed(0)
@@ -152,7 +135,7 @@ def generate_one(
         else:
             print("FLUX.2 reference images: none found (running txt2img).")
 
-    # Prepare the arguments for the FLUX.2 pipeline call, including the user prompt, generation parameters, and reference images if available.
+ # Prepare the arguments for the FLUX.2 pipeline call, including the user prompt, generation parameters, and reference images if available.
     call_kwargs = dict(
         prompt=user_prompt,
         height=int(cfg.height),
@@ -168,57 +151,13 @@ def generate_one(
     result = pipe(**call_kwargs)
     out_images: List[Image.Image] = list(result.images)
 
-    # Initialize scored_outputs with None scores; these will be updated if ranking is performed, or remain None if ranking is skipped.
-    scored_outputs: List[tuple[Image.Image, Optional[float]]] = [(img, None) for img in out_images]
-
-    should_rank = (
-        cfg.rank_outputs
-        and ref_images is not None
-        and len(ref_images) > 0
-        and len(out_images) > 1
-        and (cfg.use_clip_score or cfg.use_siglip_score or cfg.use_dino_score)
-    )
-
-    if should_rank:
-        score_device = "cuda" if (cfg.device == "cuda" and torch.cuda.is_available()) else "cpu"
-        scores = score_candidates_against_refs(
-            ref_images=ref_images,
-            cand_images=out_images,
-            device=score_device,
-            dtype=cfg.score_dtype,
-            use_clip=cfg.use_clip_score,
-            use_siglip=cfg.use_siglip_score,
-            use_dino=cfg.use_dino_score,
-            clip_weight=cfg.clip_weight,
-            siglip_weight=cfg.siglip_weight,
-            dino_weight=cfg.dino_weight,
-        )
-
-        scored_outputs = sorted(
-            list(zip(out_images, scores)),
-            key=lambda item: item[1],
-            reverse=True,
-        )
-
-        keep_n = min(max(1, int(cfg.keep_top_k)), len(scored_outputs))
-        scored_outputs = scored_outputs[:keep_n]
-
-        print("Ranking enabled. Top scores:")
-        for rank_idx, (_, score) in enumerate(scored_outputs, start=1):
-            print(f"  #{rank_idx}: {score:.4f}")
-    elif cfg.rank_outputs:
-        print("Ranking skipped. Need reference images, more than one output, and at least one scorer enabled.")
-
     time_id = timestamp()
     out_dir = out_root / style.name
     out_dir.mkdir(parents=True, exist_ok=True)
 
     paths: List[Path] = []
-    for i, (img, score) in enumerate(scored_outputs, start=1):
-        if score is None:
-            out_path = out_dir / f"{time_id}_{i:02d}.png"
-        else:
-            out_path = out_dir / f"{time_id}_{i:02d}_score_{score:.4f}.png"
+    for i, img in enumerate(out_images, start=1):
+        out_path = out_dir / f"{time_id}_{i:02d}.png"
         img.save(out_path)
         paths.append(out_path)
 
