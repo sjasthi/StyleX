@@ -1,2 +1,9 @@
+
+.venv/
 env/
-3.5/
+__pycache__/
+*.pyc
+.DS_Store
+colab_src/
+output_images/
+input_images/
